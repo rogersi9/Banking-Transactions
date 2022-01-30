@@ -311,8 +311,6 @@ public class Server extends Thread{
     {
         Transactions trans = new Transactions();
         long serverStartTime, serverEndTime;
-        boolean inBufEmpty = objNetwork.getInBufferStatus().equals("empty");
-        boolean outBufFull = objNetwork.getOutBufferStatus().equals("full");
 
         System.out.println("\n DEBUG : Server.run() - starting server thread " + objNetwork.getServerConnectionStatus());
 

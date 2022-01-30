@@ -8,6 +8,7 @@ package main;
 import main.Network;
 import main.Server;
 
+
 /**
  *
  * @author Kerly Titus
@@ -34,17 +35,18 @@ public class Driver {
         objClientSending.start();
         objClientReceiving.start();
 
-        try {
-
-            objClientSending.join();
-            objClientReceiving.join();
-            objServer.join();
-            objNetwork.join();
-        }catch (InterruptedException e){
-            System.out.println("Interrupted Exception!");
-        }
+//        try {
+//            objClientSending.join();
+//            objClientReceiving.join();
+//            objServer.join();
+//            objNetwork.join();
+//        }catch (InterruptedException e){
+//            System.out.println("Interrupted Exception!");
+//        }
 
 
 
     }
+
+
 }
