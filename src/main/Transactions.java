@@ -92,7 +92,7 @@ public class Transactions {
      *  Mutator method of Transactions class
      *
      * @return
-     * @param transmount
+     * @param transAmount
      */
     public void setTransactionAmount(double transAmount)
     {

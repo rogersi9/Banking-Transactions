@@ -25,8 +25,26 @@ public class Driver {
          ******************************************************************************************************************************************/
 
         Network objNetwork = new Network("network");            /* Activate the network */
-        objNetwork.start();
         Server objServer = new Server();
-        /* Complete here the code for the main method ...*/
+        Client objClientSending = new Client("sending");
+        Client objClientReceiving= new Client("receiving");
+
+        objNetwork.start();
+        objServer.start();
+        objClientSending.start();
+        objClientReceiving.start();
+
+        try {
+
+            objClientSending.join();
+            objClientReceiving.join();
+            objServer.join();
+            objNetwork.join();
+        }catch (InterruptedException e){
+            System.out.println("Interrupted Exception!");
+        }
+
+
+
     }
 }

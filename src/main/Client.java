@@ -16,7 +16,7 @@ import java.util.InputMismatchException;
  * @author Kerly Titus
  */
 
-public class Client {
+public class Client extends Thread{
 
     private static int numberOfTransactions;   		/* Number of transactions to process */
     private static int maxNbTransactions;      		/* Maximum number of transactions */
@@ -113,7 +113,7 @@ public class Client {
 
         try
         {
-            inputStream = new Scanner(new FileInputStream("transaction.txt"));
+            inputStream = new Scanner(new FileInputStream("src/transaction.txt"));
         }
         catch(FileNotFoundException e)
         {
@@ -158,7 +158,7 @@ public class Client {
 
         while (i < getNumberOfTransactions())
         {
-            // while( objNetwork.getInBufferStatus().equals("full") );     /* Alternatively, busy-wait until the network input buffer is available */
+            while( objNetwork.getInBufferStatus().equals("full")) Thread.yield();     /* Alternatively, busy-wait until the network input buffer is available */
 
             transaction[i].setTransactionStatus("sent");   /* Set current transaction status */
 
@@ -182,12 +182,10 @@ public class Client {
 
         while (i < getNumberOfTransactions())
         {
-            // while( objNetwork.getOutBufferStatus().equals("empty"));  	/* Alternatively, busy-wait until the network output buffer is available */
-
+            while( objNetwork.getOutBufferStatus().equals("empty")) Thread.yield();  	/* Alternatively, busy-wait until the network output buffer is available */
             objNetwork.receive(transact);                               	/* Receive updated transaction from the network buffer */
 
             System.out.println("\n DEBUG : Client.receiveTransactions() - receiving updated transaction on account " + transact.getAccountNumber());
-
             System.out.println(transact);                               	/* Display updated transaction */
             i++;
         }
@@ -214,6 +212,18 @@ public class Client {
         Transactions transact = new Transactions();
         long sendClientStartTime, sendClientEndTime, receiveClientStartTime, receiveClientEndTime;
 
-        /* Implement here the code for the run method ... */
+        if(this.getClientOperation().equals("sending")){
+            sendClientStartTime = System.currentTimeMillis();
+            this.sendTransactions();
+            sendClientEndTime = System.currentTimeMillis();
+            System.out.println("\n Terminating client sending thread - " + " Running time " + (sendClientEndTime - sendClientStartTime) + " milliseconds");
+
+        }else{
+            receiveClientStartTime = System.currentTimeMillis();
+            this.receiveTransactions(transact);
+            receiveClientEndTime = System.currentTimeMillis();
+            System.out.println("\n Terminating client receiving thread - " + " Running time " + (receiveClientEndTime - receiveClientStartTime) + " milliseconds");
+            objNetwork.disconnect(objNetwork.getClientIP()); // disconnect if transaction are done
+        }
     }
 }

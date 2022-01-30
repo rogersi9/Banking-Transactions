@@ -16,7 +16,7 @@ import java.util.InputMismatchException;
  * @author Kerly Titus
  */
 
-public class Server {
+public class Server extends Thread{
 
     int numberOfTransactions;         /* Number of transactions handled by the server */
     int numberOfAccounts;             /* Number of accounts stored in the server */
@@ -129,7 +129,7 @@ public class Server {
 
         try
         {
-            inputStream = new Scanner(new FileInputStream("account.txt"));
+            inputStream = new Scanner(new FileInputStream("src/account.txt"));
         }
         catch(FileNotFoundException e)
         {
@@ -193,7 +193,7 @@ public class Server {
         /* Process the accounts until the client disconnects */
         while ((!objNetwork.getClientConnectionStatus().equals("disconnected")))
         {
-            /* while( (objNetwork.getInBufferStatus().equals("empty"))); */  /* Alternatively, busy-wait until the network input buffer is available */
+            while((!objNetwork.getClientConnectionStatus().equals("disconnected")) && (objNetwork.getInBufferStatus().equals("empty"))) Thread.yield();
 
             if (!objNetwork.getInBufferStatus().equals("empty"))
             {
@@ -232,7 +232,7 @@ public class Server {
                             System.out.println("\n DEBUG : Server.processTransactions() - Obtaining balance from account" + trans.getAccountNumber());
                         }
 
-                // while( (objNetwork.getOutBufferStatus().equals("full"))); /* Alternatively,  busy-wait until the network output buffer is available */
+                 while( (objNetwork.getOutBufferStatus().equals("full"))) Thread.yield(); /* Alternatively,  busy-wait until the network output buffer is available */
 
                 System.out.println("\n DEBUG : Server.processTransactions() - transferring out account " + trans.getAccountNumber());
 
@@ -308,12 +308,19 @@ public class Server {
      * @param
      */
     public void run()
-    {   Transactions trans = new Transactions();
+    {
+        Transactions trans = new Transactions();
         long serverStartTime, serverEndTime;
+        boolean inBufEmpty = objNetwork.getInBufferStatus().equals("empty");
+        boolean outBufFull = objNetwork.getOutBufferStatus().equals("full");
 
         System.out.println("\n DEBUG : Server.run() - starting server thread " + objNetwork.getServerConnectionStatus());
 
-        /* Implement the code for the run method */
+        serverStartTime = System.currentTimeMillis();
+        this.processTransactions(trans);
+        serverEndTime = System.currentTimeMillis();
+
+        objNetwork.disconnect(objNetwork.getServerIP()); // disconnect if transaction are done
 
         System.out.println("\n Terminating server thread - " + " Running time " + (serverEndTime - serverStartTime) + " milliseconds");
 
